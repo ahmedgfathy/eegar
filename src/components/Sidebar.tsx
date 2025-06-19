@@ -6,16 +6,17 @@ import {
   Building, 
   MessageSquare, 
   BarChart3,
-  Upload
+  Upload,
+  UserCheck
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home },
-  { name: 'Contacts', href: '/contacts', icon: Users },
-  { name: 'Properties', href: '/properties', icon: Building },
-  { name: 'Messages', href: '/messages', icon: MessageSquare },
-  { name: 'Reports', href: '/reports', icon: BarChart3 },
-  { name: 'Import Data', href: '/import', icon: Upload },
+  { name: 'لوحة التحكم', href: '/', icon: Home },
+  { name: 'السماسرة', href: '/brokers', icon: Users },
+  { name: 'العقارات', href: '/properties', icon: Building },
+  { name: 'الرسائل', href: '/messages', icon: MessageSquare },
+  { name: 'التقارير', href: '/reports', icon: BarChart3 },
+  { name: 'استيراد البيانات', href: '/import', icon: Upload },
 ];
 
 export const Sidebar: React.FC = () => {

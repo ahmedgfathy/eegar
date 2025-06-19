@@ -32,7 +32,7 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Cairo', 'system-ui', 'sans-serif'],
       },
     },
   },
