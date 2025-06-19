@@ -10,50 +10,68 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Contact {
+model Broker {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
-  phone       String?  @db.VarChar(50)
+  phone       String?  @db.VarChar(50) @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  // Contact Information
+  // Broker Information
   email       String?  @db.VarChar(255)
   address     String?  @db.Text
   city        String?  @db.VarChar(100)
   area        String?  @db.VarChar(100)
+  company     String?  @db.VarChar(255)
   
-  // Lead Information
-  status      ContactStatus @default(NEW_LEAD)
-  priority    Priority      @default(MEDIUM)
-  source      String?       @db.VarChar(100)
+  // Broker Profile
+  status      BrokerStatus @default(ACTIVE)
+  licenseNumber String?   @db.VarChar(100)
+  yearsOfExperience Int?
+  specializations String? @db.Text // JSON array of specializations
+  profileImage String?   @db.VarChar(255)
+  
+  // Performance Metrics
+  totalProperties Int      @default(0)
+  activeDealCount Int      @default(0)
+  lastActivity    DateTime?
+  rating          Decimal? @db.Decimal(3,2)
+  totalDeals      Int      @default(0)
+  
+  // Contact Preferences
+  preferredContactMethod ContactMethod @default(WHATSAPP)
   notes       String?       @db.Text
-  lastContact DateTime?
-  nextFollowUp DateTime?
-  
-  // Property Interest
-  propertyType String?   @db.VarChar(100)
-  budget       Decimal?  @db.Decimal(15,2)
-  location     String?   @db.VarChar(255)
   
   // Relationships
   messages    Message[]
-  properties  PropertyInquiry[]
+  ownedProperties Property[] @relation("PropertyOwner")
+  propertyInquiries PropertyInquiry[]
+  sentInquiries PropertyInquiry[] @relation("InquirySender")
   
-  @@map("contacts")
+  @@map("brokers")
 }
 
 model Message {
   id          Int      @id @default(autoincrement())
-  contactId   Int
+  brokerId    Int
   content     String   @db.Text
   messageDate DateTime
   messageTime String   @db.VarChar(10)
   attachments String?  @db.Text // JSON string for file attachments
   messageType MessageType @default(TEXT)
+  
+  // Property extraction flags
+  containsPropertyInfo Boolean @default(false)
+  extractedPropertyId Int?
+  
+  // Message analysis
+  sentiment   String?  @db.VarChar(50) // POSITIVE, NEGATIVE, NEUTRAL
+  language    String?  @db.VarChar(10) // ar, en
+  
   createdAt   DateTime @default(now())
   
-  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  broker      Broker   @relation(fields: [brokerId], references: [id], onDelete: Cascade)
+  extractedProperty Property? @relation(fields: [extractedPropertyId], references: [id])
   
   @@map("messages")
 }
@@ -63,60 +81,128 @@ model Property {
   title       String   @db.VarChar(255)
   description String?  @db.Text
   propertyType PropertyType
-  price       Decimal  @db.Decimal(15,2)
-  area        Decimal  @db.Decimal(10,2) // in square meters
-  location    String   @db.VarChar(255)
+  listingType ListingType // FOR_SALE, FOR_RENT, WANTED
+  
+  // Pricing
+  price       Decimal?  @db.Decimal(15,2)
+  pricePerMeter Decimal? @db.Decimal(10,2)
+  currency    String   @db.VarChar(10) @default("EGP")
+  negotiable  Boolean  @default(true)
+  
+  // Location
+  area        Decimal? @db.Decimal(10,2) // in square meters
+  location    String?  @db.VarChar(255)
   address     String?  @db.Text
-  city        String   @db.VarChar(100)
+  city        String?  @db.VarChar(100)
   neighborhood String? @db.VarChar(100)
+  district    String?  @db.VarChar(100)
   
   // Property Details
   bedrooms    Int?
   bathrooms   Int?
   floors      Int?
+  floor       Int?     // which floor (for apartments)
   parking     Boolean  @default(false)
   furnished   Boolean  @default(false)
+  balcony     Boolean  @default(false)
+  elevator    Boolean  @default(false)
+  
+  // Property Features
+  features    String?  @db.Text // JSON array of features
+  condition   PropertyCondition?
+  buildingAge Int?     // in years
   
   // Property Status
   status      PropertyStatus @default(AVAILABLE)
   featured    Boolean        @default(false)
+  urgentSale  Boolean        @default(false)
+  
+  // Source Information
+  extractedFromMessage Boolean @default(false)
+  sourceMessageId Int?
+  ownerId     Int?
   
   // Media
   images      String?  @db.Text // JSON string for image URLs
+  
+  // Metadata
+  viewCount   Int      @default(0)
+  inquiryCount Int     @default(0)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   // Relationships
+  owner       Broker?  @relation("PropertyOwner", fields: [ownerId], references: [id])
   inquiries   PropertyInquiry[]
+  messages    Message[] // Messages that extracted this property
   
   @@map("properties")
 }
 
 model PropertyInquiry {
   id         Int      @id @default(autoincrement())
-  contactId  Int
+  brokerId   Int      // The broker making the inquiry
   propertyId Int
+  senderId   Int?     // The broker who sent the inquiry (for referrals)
+  inquiryType InquiryType @default(GENERAL)
   inquiryDate DateTime @default(now())
   message    String?  @db.Text
   status     InquiryStatus @default(PENDING)
   
-  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  // Inquiry Details
+  budget     Decimal? @db.Decimal(15,2)
+  clientRequirements String? @db.Text
+  urgency    Priority @default(MEDIUM)
+  
+  // Response
+  responseDate DateTime?
+  response   String?  @db.Text
+  
+  broker     Broker   @relation(fields: [brokerId], references: [id], onDelete: Cascade)
   property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  sender     Broker?  @relation("InquirySender", fields: [senderId], references: [id])
   
   @@map("property_inquiries")
 }
 
-enum ContactStatus {
-  NEW_LEAD
-  CONTACTED
-  QUALIFIED
-  VIEWING_SCHEDULED
-  PROPOSAL_SENT
-  NEGOTIATING
-  CLOSED_WON
-  CLOSED_LOST
-  FOLLOW_UP
+enum BrokerStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum ContactMethod {
+  WHATSAPP
+  PHONE
+  EMAIL
+  IN_PERSON
+}
+
+enum ListingType {
+  FOR_SALE
+  FOR_RENT
+  WANTED
+  SOLD
+  RENTED
+}
+
+enum PropertyCondition {
+  NEW
+  EXCELLENT
+  GOOD
+  FAIR
+  NEEDS_RENOVATION
+}
+
+enum InquiryType {
+  GENERAL
+  VIEWING_REQUEST
+  PRICE_INQUIRY
+  AVAILABILITY_CHECK
+  NEGOTIATION
+  REFERRAL
 }
 
 enum Priority {
@@ -133,16 +219,21 @@ enum MessageType {
   VOICE
   VIDEO
   LINK
+  LOCATION
 }
 
 enum PropertyType {
   APARTMENT
   HOUSE
   VILLA
+  DUPLEX
+  PENTHOUSE
   OFFICE
   SHOP
   WAREHOUSE
   LAND
+  GARAGE
+  STUDIO
 }
 
 enum PropertyStatus {
@@ -151,6 +242,7 @@ enum PropertyStatus {
   RENTED
   RESERVED
   UNDER_CONSTRUCTION
+  OFF_MARKET
 }
 
 enum InquiryStatus {
@@ -159,4 +251,5 @@ enum InquiryStatus {
   SCHEDULED
   COMPLETED
   CANCELLED
+  EXPIRED
 }
