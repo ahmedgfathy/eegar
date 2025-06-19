@@ -1,0 +1,162 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Contact {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  phone       String?  @db.VarChar(50)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Contact Information
+  email       String?  @db.VarChar(255)
+  address     String?  @db.Text
+  city        String?  @db.VarChar(100)
+  area        String?  @db.VarChar(100)
+  
+  // Lead Information
+  status      ContactStatus @default(NEW_LEAD)
+  priority    Priority      @default(MEDIUM)
+  source      String?       @db.VarChar(100)
+  notes       String?       @db.Text
+  lastContact DateTime?
+  nextFollowUp DateTime?
+  
+  // Property Interest
+  propertyType String?   @db.VarChar(100)
+  budget       Decimal?  @db.Decimal(15,2)
+  location     String?   @db.VarChar(255)
+  
+  // Relationships
+  messages    Message[]
+  properties  PropertyInquiry[]
+  
+  @@map("contacts")
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  contactId   Int
+  content     String   @db.Text
+  messageDate DateTime
+  messageTime String   @db.VarChar(10)
+  attachments String?  @db.Text // JSON string for file attachments
+  messageType MessageType @default(TEXT)
+  createdAt   DateTime @default(now())
+  
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  
+  @@map("messages")
+}
+
+model Property {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  propertyType PropertyType
+  price       Decimal  @db.Decimal(15,2)
+  area        Decimal  @db.Decimal(10,2) // in square meters
+  location    String   @db.VarChar(255)
+  address     String?  @db.Text
+  city        String   @db.VarChar(100)
+  neighborhood String? @db.VarChar(100)
+  
+  // Property Details
+  bedrooms    Int?
+  bathrooms   Int?
+  floors      Int?
+  parking     Boolean  @default(false)
+  furnished   Boolean  @default(false)
+  
+  // Property Status
+  status      PropertyStatus @default(AVAILABLE)
+  featured    Boolean        @default(false)
+  
+  // Media
+  images      String?  @db.Text // JSON string for image URLs
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationships
+  inquiries   PropertyInquiry[]
+  
+  @@map("properties")
+}
+
+model PropertyInquiry {
+  id         Int      @id @default(autoincrement())
+  contactId  Int
+  propertyId Int
+  inquiryDate DateTime @default(now())
+  message    String?  @db.Text
+  status     InquiryStatus @default(PENDING)
+  
+  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  @@map("property_inquiries")
+}
+
+enum ContactStatus {
+  NEW_LEAD
+  CONTACTED
+  QUALIFIED
+  VIEWING_SCHEDULED
+  PROPOSAL_SENT
+  NEGOTIATING
+  CLOSED_WON
+  CLOSED_LOST
+  FOLLOW_UP
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  DOCUMENT
+  VOICE
+  VIDEO
+  LINK
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  VILLA
+  OFFICE
+  SHOP
+  WAREHOUSE
+  LAND
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  SOLD
+  RENTED
+  RESERVED
+  UNDER_CONSTRUCTION
+}
+
+enum InquiryStatus {
+  PENDING
+  RESPONDED
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
