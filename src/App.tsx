@@ -11,7 +11,6 @@ import { PublicHome } from './pages/PublicHome';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { UserDashboard } from './pages/UserDashboard';
-import { Dashboard } from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import './index.css';
 

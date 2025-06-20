@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, User, Phone, Mail, MapPin, Calendar, Star, Building, DollarSign, Home } from 'lucide-react';
+import { X, Save, User, MapPin, Calendar, Star, Building, DollarSign, Home } from 'lucide-react';
 import { Broker, BrokerStatus } from '../types/broker';
 
 interface BrokerModalProps {
