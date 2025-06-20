@@ -11,13 +11,13 @@ import {
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'لوحة التحكم', href: '/', icon: Home },
-  { name: 'السماسرة', href: '/brokers', icon: Users },
-  { name: 'العقارات', href: '/properties', icon: Building },
-  { name: 'جهات الاتصال', href: '/contacts', icon: UserCheck },
-  { name: 'الرسائل', href: '/messages', icon: MessageSquare },
-  { name: 'التقارير', href: '/reports', icon: BarChart3 },
-  { name: 'استيراد البيانات', href: '/import', icon: Upload },
+  { name: 'لوحة التحكم', href: '/admin/', icon: Home },
+  { name: 'السماسرة', href: '/admin/brokers', icon: Users },
+  { name: 'العقارات', href: '/admin/properties', icon: Building },
+  { name: 'جهات الاتصال', href: '/admin/contacts', icon: UserCheck },
+  { name: 'الرسائل', href: '/admin/messages', icon: MessageSquare },
+  { name: 'التقارير', href: '/admin/reports', icon: BarChart3 },
+  { name: 'استيراد البيانات', href: '/admin/import', icon: Upload },
 ];
 
 interface SidebarProps {
