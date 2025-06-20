@@ -111,7 +111,7 @@ const PublicHeader: React.FC = () => {
           {/* Login Button */}
           <button 
             className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-            onClick={() => window.location.href = '/admin'}
+            onClick={() => window.location.href = '/login'}
           >
             تسجيل الدخول
           </button>

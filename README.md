@@ -1,4 +1,6 @@
-# Getting Started with Create React App
+# Eegar - Real Estate CRM System
+
+A modern, responsive CRM application built specifically for real estate professionals to manage leads, contacts, and properties.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

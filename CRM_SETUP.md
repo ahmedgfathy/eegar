@@ -1,4 +1,4 @@
-# Real Estate CRM Application
+# Eegar - Real Estate CRM Application
 
 A modern, responsive CRM application built specifically for real estate professionals to manage WhatsApp leads, contacts, and properties.
 
@@ -13,13 +13,13 @@ A modern, responsive CRM application built specifically for real estate professi
 
 1. **Create Database**
 ```sql
-CREATE DATABASE whatscrm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE eegar CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 2. **Install & Setup**
 ```bash
 # Navigate to project
-cd whatscrm
+cd eegar
 
 # Install dependencies
 npm install
