@@ -120,8 +120,14 @@ class UserAPI {
     return { success: true, user };
   }
 
-  async getAllUsers(): Promise<User[]> {
-    return this.users.map(user => ({ ...user, password: undefined } as any));
+  async getAllUsers(): Promise<any[]> {
+    return this.users.map(user => ({ 
+      id: user.id,
+      mobile: user.mobile,
+      isVerified: user.isVerified,
+      role: user.role,
+      createdAt: user.createdAt
+    }));
   }
 
   async resendVerificationCode(mobile: string): Promise<{ success: boolean; error?: string }> {

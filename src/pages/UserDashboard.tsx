@@ -14,7 +14,7 @@ interface UserData {
 }
 
 export const UserDashboard: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const [properties, setProperties] = useState<Property[]>([]);
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,6 +99,15 @@ export const UserDashboard: React.FC = () => {
             <Logo />
             
             <div className="flex items-center space-x-4 space-x-reverse">
+              {isAdmin && (
+                <a
+                  href="/admin-panel"
+                  className="flex items-center space-x-2 space-x-reverse text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-2 rounded-lg"
+                >
+                  <Users className="h-5 w-5" />
+                  <span>لوحة الإدارة</span>
+                </a>
+              )}
               <div className="text-right">
                 <p className="text-sm text-gray-500">مرحباً</p>
                 <p className="font-semibold text-gray-900">{user?.mobile}</p>

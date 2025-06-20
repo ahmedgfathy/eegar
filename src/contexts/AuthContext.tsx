@@ -12,6 +12,8 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
   login: (mobile: string, password: string) => Promise<boolean>;
   register: (mobile: string, password: string) => Promise<boolean>;
   verifyCode: (mobile: string, code: string) => Promise<boolean>;
@@ -61,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: result.user.id,
           mobile: result.user.mobile,
           isVerified: result.user.isVerified,
+          role: result.user.role,
           createdAt: result.user.createdAt
         };
         setUser(userData);
@@ -116,6 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: result.user.id,
           mobile: result.user.mobile,
           isVerified: result.user.isVerified,
+          role: result.user.role,
           createdAt: result.user.createdAt
         };
         setUser(userData);
@@ -151,6 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: result.user.id,
           mobile: result.user.mobile,
           isVerified: result.user.isVerified,
+          role: result.user.role,
           createdAt: result.user.createdAt
         };
         setUser(userData);
@@ -180,6 +185,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
+    isAdmin: user?.role === 'admin',
+    isSuperAdmin: user?.role === 'superadmin',
     login,
     register,
     verifyCode,

@@ -10,6 +10,7 @@ import { PublicHome } from './pages/PublicHome';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { UserDashboard } from './pages/UserDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import './index.css';
 
 function App() {
@@ -27,6 +28,13 @@ function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <UserDashboard />
+            </ProtectedRoute>
+          } />
+          
+          {/* Protected Admin Dashboard */}
+          <Route path="/admin-panel" element={
+            <ProtectedRoute>
+              <AdminDashboard />
             </ProtectedRoute>
           } />
           
