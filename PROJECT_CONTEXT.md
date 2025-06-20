@@ -87,10 +87,12 @@ src/
 ## Current Status
 - ✅ Project successfully renamed to "eegar"
 - ✅ All changes committed and pushed to GitHub
-- ✅ Development server running on http://localhost:3000
+- ✅ Frontend development server running on http://localhost:3000
+- ✅ Backend CRM server running on http://localhost:3001  
 - ✅ Authentication system fully functional with role management
 - ✅ Super Admin account created and functional
 - ✅ Admin Dashboard with user management interface
+- ✅ CRM Dashboard with broker and property management
 - ✅ Logo refined to icon-only design
 - ✅ Font sizes optimized throughout
 - ⏳ GitHub repository needs manual renaming to "eegar"
@@ -124,7 +126,14 @@ To test the super admin features:
 ## Development Commands
 ```bash
 cd /Users/ahmedgomaa/Downloads/eegar
-npm start          # Start development server
+
+# Frontend (React App)
+npm start          # Start development server on http://localhost:3000
+
+# Backend (CRM API Server)
+node server-broker-new.js  # Start backend server on http://localhost:3001
+
+# Other commands
 npm run build      # Build for production
 npm test           # Run tests
 ```
