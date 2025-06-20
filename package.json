@@ -26,6 +26,7 @@
     "express": "^4.21.2",
     "lucide-react": "^0.517.0",
     "mysql2": "^3.14.1",
+    "pg": "^8.13.1",
     "prisma": "^6.10.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -38,6 +39,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@types/pg": "^8.11.10",
     "@vercel/node": "^3.0.12"
   },
   "scripts": {
@@ -46,6 +48,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "migrate": "node scripts/migrate-to-cloud.js",
+    "migrate-supabase": "node scripts/migrate-to-supabase.js",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "postinstall": "prisma generate"
