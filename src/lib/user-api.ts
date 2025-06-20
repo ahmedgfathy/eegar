@@ -5,6 +5,7 @@ interface User {
   password: string;
   isVerified: boolean;
   createdAt: string;
+  role: 'user' | 'admin' | 'superadmin';
   verificationCode?: string;
 }
 
@@ -15,6 +16,7 @@ class UserAPI {
       mobile: '01012345678',
       password: 'password123', // In real app, this would be hashed
       isVerified: true,
+      role: 'user',
       createdAt: '2025-01-15T10:30:00Z'
     },
     {
@@ -22,7 +24,16 @@ class UserAPI {
       mobile: '01098765432',
       password: 'password456',
       isVerified: true,
+      role: 'user',
       createdAt: '2025-01-14T14:20:00Z'
+    },
+    {
+      id: 'superadmin',
+      mobile: '01002778090',
+      password: 'ZeroCall20!@H',
+      isVerified: true,
+      role: 'superadmin',
+      createdAt: '2025-06-20T12:00:00Z'
     }
   ];
 
@@ -87,6 +98,7 @@ class UserAPI {
       mobile,
       password: 'temp_password', // This should be set during registration
       isVerified: true,
+      role: 'user',
       createdAt: new Date().toISOString()
     };
 

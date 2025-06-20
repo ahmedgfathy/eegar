@@ -5,6 +5,7 @@ interface User {
   id: string;
   mobile: string;
   isVerified: boolean;
+  role: 'user' | 'admin' | 'superadmin';
   createdAt: string;
 }
 
