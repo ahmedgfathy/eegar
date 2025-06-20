@@ -20,15 +20,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     if (req.method === 'GET') {
-      const contacts = await prisma.contact.findMany({
+      // Return property inquiries as "contacts" since they represent contact/inquiry data
+      const inquiries = await prisma.propertyInquiry.findMany({
         include: {
-          messages: {
-            take: 1,
-            orderBy: { messageDate: 'desc' }
+          broker: {
+            select: {
+              id: true,
+              name: true,
+              phone: true,
+              email: true
+            }
+          },
+          property: {
+            select: {
+              id: true,
+              title: true,
+              propertyType: true,
+              location: true
+            }
           }
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { inquiryDate: 'desc' }
       });
+      
+      // Transform inquiries to match expected contact structure
+      const contacts = inquiries.map(inquiry => ({
+        id: inquiry.id,
+        name: inquiry.broker.name,
+        email: inquiry.broker.email,
+        phone: inquiry.broker.phone,
+        company: `Inquiry for ${inquiry.property.title}`,
+        status: inquiry.status,
+        created_at: inquiry.inquiryDate,
+        notes: inquiry.message,
+        propertyId: inquiry.property.id,
+        propertyTitle: inquiry.property.title,
+        inquiryType: inquiry.inquiryType
+      }));
+      
       res.json(contacts);
     } else {
       res.status(405).json({ error: 'Method not allowed' });

@@ -25,11 +25,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const [
       totalBrokers, 
-      totalContacts, 
       totalMessages, 
       totalProperties, 
-      qualifiedLeads, 
-      newLeads,
+      totalInquiries,
       propertiesForSale,
       propertiesForRent,
       propertiesWanted,
@@ -38,11 +36,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       topBrokers
     ] = await Promise.all([
       prisma.broker.count(),
-      prisma.contact.count(),
       prisma.message.count(),
       prisma.property.count(),
-      prisma.contact.count({ where: { status: 'QUALIFIED' } }),
-      prisma.contact.count({ where: { status: 'NEW_LEAD' } }),
+      prisma.propertyInquiry.count(),
       prisma.property.count({ where: { listingType: 'FOR_SALE' } }),
       prisma.property.count({ where: { listingType: 'FOR_RENT' } }),
       prisma.property.count({ where: { listingType: 'WANTED' } }),
@@ -71,10 +67,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     res.json({
       totalBrokers,
-      totalContacts,
+      totalContacts: 0, // We don't have a contacts table
       totalMessages,
       totalProperties,
-      totalInquiries: qualifiedLeads + newLeads,
+      totalInquiries,
       propertiesForSale: propertiesForSale || 0,
       propertiesForRent: propertiesForRent || 0,
       propertiesWanted: propertiesWanted || 0,
