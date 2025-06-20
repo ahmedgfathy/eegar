@@ -14,6 +14,7 @@ const navigation = [
   { name: 'لوحة التحكم', href: '/', icon: Home },
   { name: 'السماسرة', href: '/brokers', icon: Users },
   { name: 'العقارات', href: '/properties', icon: Building },
+  { name: 'جهات الاتصال', href: '/contacts', icon: UserCheck },
   { name: 'الرسائل', href: '/messages', icon: MessageSquare },
   { name: 'التقارير', href: '/reports', icon: BarChart3 },
   { name: 'استيراد البيانات', href: '/import', icon: Upload },

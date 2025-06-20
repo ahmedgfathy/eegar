@@ -6,10 +6,12 @@ import { Layout } from './components/Layout';
 import { BrokerDashboard } from './pages/BrokerDashboard';
 import { Brokers } from './pages/Brokers';
 import { Properties } from './pages/Properties';
+import { Contacts } from './pages/Contacts';
 import { PublicHome } from './pages/PublicHome';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { UserDashboard } from './pages/UserDashboard';
+import { Dashboard } from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import './index.css';
 
@@ -24,8 +26,17 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Protected User Dashboard */}
+          {/* Protected CRM Dashboard */}
           <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Protected User Dashboard */}
+          <Route path="/user-dashboard" element={
             <ProtectedRoute>
               <UserDashboard />
             </ProtectedRoute>
@@ -46,6 +57,7 @@ function App() {
                 <Route path="/dashboard" element={<BrokerDashboard />} />
                 <Route path="/brokers" element={<Brokers />} />
                 <Route path="/properties" element={<Properties />} />
+                <Route path="/contacts" element={<Contacts />} />
                 <Route path="/messages" element={<div className="p-8 text-center text-gray-500">Messages page coming soon...</div>} />
                 <Route path="/settings" element={<div className="p-8 text-center text-gray-500">Settings page coming soon...</div>} />
               </Routes>
