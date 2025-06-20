@@ -21,6 +21,10 @@ export interface Broker {
   notes: string | null;
   createdAt: Date;
   updatedAt: Date;
+  // Optional fields included when fetching detailed broker information
+  ownedProperties?: Property[];
+  messages?: Message[];
+  propertyInquiries?: PropertyInquiry[];
 }
 
 export interface Property {

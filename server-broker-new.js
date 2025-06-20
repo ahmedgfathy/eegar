@@ -162,14 +162,112 @@ app.get('/api/brokers/:id', async (req, res) => {
 app.put('/api/brokers/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    const updateData = { ...req.body };
+    if (updateData.lastActivity) {
+      updateData.lastActivity = new Date(updateData.lastActivity);
+    }
+    
     const broker = await prisma.broker.update({
       where: { id: parseInt(id) },
-      data: req.body
+      data: updateData,
+      include: {
+        _count: {
+          select: {
+            ownedProperties: true,
+            messages: true,
+            propertyInquiries: true
+          }
+        }
+      }
     });
     res.json(broker);
   } catch (error) {
     console.error('Broker update error:', error);
     res.status(500).json({ error: 'Failed to update broker' });
+  }
+});
+
+app.post('/api/brokers', async (req, res) => {
+  try {
+    const brokerData = {
+      ...req.body,
+      status: req.body.status || 'ACTIVE',
+      lastActivity: new Date()
+    };
+    
+    const broker = await prisma.broker.create({
+      data: brokerData,
+      include: {
+        _count: {
+          select: {
+            ownedProperties: true,
+            messages: true,
+            propertyInquiries: true
+          }
+        }
+      }
+    });
+    res.status(201).json(broker);
+  } catch (error) {
+    console.error('Broker create error:', error);
+    res.status(500).json({ error: 'Failed to create broker' });
+  }
+});
+
+app.delete('/api/brokers/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Check if broker exists
+    const broker = await prisma.broker.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        _count: {
+          select: {
+            ownedProperties: true,
+            messages: true,
+            propertyInquiries: true
+          }
+        }
+      }
+    });
+    
+    if (!broker) {
+      return res.status(404).json({ error: 'Broker not found' });
+    }
+    
+    // Check if broker has dependencies
+    const hasProperties = broker._count.ownedProperties > 0;
+    const hasMessages = broker._count.messages > 0;
+    const hasInquiries = broker._count.propertyInquiries > 0;
+    
+    if (hasProperties || hasMessages || hasInquiries) {
+      // Soft delete - just deactivate the broker
+      const updatedBroker = await prisma.broker.update({
+        where: { id: parseInt(id) },
+        data: { 
+          status: 'INACTIVE',
+          lastActivity: new Date()
+        }
+      });
+      res.json({ 
+        message: 'Broker deactivated due to existing data', 
+        broker: updatedBroker,
+        soft_delete: true
+      });
+    } else {
+      // Hard delete if no dependencies
+      await prisma.broker.delete({
+        where: { id: parseInt(id) }
+      });
+      res.json({ 
+        message: 'Broker deleted successfully',
+        soft_delete: false
+      });
+    }
+  } catch (error) {
+    console.error('Broker delete error:', error);
+    res.status(500).json({ error: 'Failed to delete broker' });
   }
 });
 

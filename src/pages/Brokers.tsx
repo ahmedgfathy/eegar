@@ -6,15 +6,18 @@ import {
   MapPin, 
   Search, 
   Filter,
-  MoreVertical,
   UserCheck,
   Building,
-  MessageSquare,
   Star,
-  TrendingUp
+  Edit,
+  Trash2,
+  Eye,
+  Plus
 } from 'lucide-react';
 import { brokerApi } from '../lib/broker-api';
 import { Broker } from '../types/broker';
+import { BrokerModal } from '../components/BrokerModal';
+import { ConfirmDeleteModal } from '../components/ConfirmDeleteModal';
 
 export const Brokers: React.FC = () => {
   const [brokers, setBrokers] = useState<Broker[]>([]);
@@ -23,11 +26,44 @@ export const Brokers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
+  // Modal states
+  const [brokerModal, setBrokerModal] = useState<{
+    isOpen: boolean;
+    broker: Broker | null;
+    mode: 'view' | 'edit' | 'create';
+  }>({
+    isOpen: false,
+    broker: null,
+    mode: 'create'
+  });
+
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    broker: Broker | null;
+  }>({
+    isOpen: false,
+    broker: null
+  });
+
+  const [actionLoading, setActionLoading] = useState(false);
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    show: false,
+    message: '',
+    type: 'success'
+  });
+
   useEffect(() => {
     const fetchBrokers = async () => {
       try {
         setLoading(true);
-        const brokersData = await brokerApi.getBrokers();
+        const brokersData = await brokerApi.getBrokers({
+          search: searchTerm || undefined,
+          status: statusFilter || undefined
+        });
         setBrokers(brokersData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load brokers');
@@ -37,8 +73,135 @@ export const Brokers: React.FC = () => {
     };
 
     fetchBrokers();
-  }, []);
+  }, [searchTerm, statusFilter]);
 
+  // Helper functions
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => {
+      setNotification({ show: false, message: '', type: 'success' });
+    }, 3000);
+  };
+
+  const refreshBrokers = async () => {
+    try {
+      const brokersData = await brokerApi.getBrokers({
+        search: searchTerm || undefined,
+        status: statusFilter || undefined
+      });
+      setBrokers(brokersData);
+    } catch (err) {
+      console.error('Failed to refresh brokers:', err);
+    }
+  };
+
+  // Modal handlers
+  const handleCreateBroker = () => {
+    setBrokerModal({
+      isOpen: true,
+      broker: null,
+      mode: 'create'
+    });
+  };
+
+  const handleViewBroker = async (broker: Broker) => {
+    try {
+      const fullBroker = await brokerApi.getBroker(broker.id);
+      setBrokerModal({
+        isOpen: true,
+        broker: fullBroker,
+        mode: 'view'
+      });
+    } catch (err) {
+      showNotification('فشل في تحميل تفاصيل السمسار', 'error');
+    }
+  };
+
+  const handleEditBroker = async (broker: Broker) => {
+    try {
+      const fullBroker = await brokerApi.getBroker(broker.id);
+      setBrokerModal({
+        isOpen: true,
+        broker: fullBroker,
+        mode: 'edit'
+      });
+    } catch (err) {
+      showNotification('فشل في تحميل تفاصيل السمسار', 'error');
+    }
+  };
+
+  const handleDeleteBroker = (broker: Broker) => {
+    setDeleteModal({
+      isOpen: true,
+      broker
+    });
+  };
+
+  const closeBrokerModal = () => {
+    setBrokerModal({
+      isOpen: false,
+      broker: null,
+      mode: 'create'
+    });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      broker: null
+    });
+  };
+
+  const handleSaveBroker = async (data: Partial<Broker>) => {
+    try {
+      setActionLoading(true);
+      
+      if (brokerModal.mode === 'create') {
+        await brokerApi.createBroker(data);
+        showNotification('تم إضافة السمسار بنجاح', 'success');
+      } else if (brokerModal.mode === 'edit' && brokerModal.broker) {
+        await brokerApi.updateBroker(brokerModal.broker.id, data);
+        showNotification('تم تحديث السمسار بنجاح', 'success');
+      }
+      
+      await refreshBrokers();
+      closeBrokerModal();
+    } catch (err) {
+      showNotification(
+        err instanceof Error ? err.message : 'حدث خطأ أثناء حفظ السمسار',
+        'error'
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteModal.broker) return;
+    
+    try {
+      setActionLoading(true);
+      const result = await brokerApi.deleteBroker(deleteModal.broker.id);
+      
+      if (result.soft_delete) {
+        showNotification('تم إلغاء تفعيل السمسار بدلاً من الحذف بسبب وجود بيانات مرتبطة', 'success');
+      } else {
+        showNotification('تم حذف السمسار بنجاح', 'success');
+      }
+      
+      await refreshBrokers();
+      closeDeleteModal();
+    } catch (err) {
+      showNotification(
+        err instanceof Error ? err.message : 'حدث خطأ أثناء حذف السمسار',
+        'error'
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Filter brokers
   const filteredBrokers = brokers.filter(broker => {
     const matchesSearch = broker.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          broker.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -47,6 +210,7 @@ export const Brokers: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
+  // Status utilities
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE': return 'bg-green-100 text-green-800';
@@ -97,8 +261,11 @@ export const Brokers: React.FC = () => {
               <p className="text-gray-600">إدارة شبكة السماسرة والتواصل معهم</p>
             </div>
             <div className="flex items-center space-x-4 space-x-reverse">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                <Users className="h-5 w-5 mr-2" />
+              <button 
+                onClick={handleCreateBroker}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+              >
+                <Plus className="h-5 w-5 ml-2" />
                 إضافة سمسار
               </button>
             </div>
@@ -215,9 +382,29 @@ export const Brokers: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                <button className="p-1 hover:bg-gray-100 rounded">
-                  <MoreVertical className="h-5 w-5 text-gray-400" />
-                </button>
+                <div className="flex items-center space-x-1 space-x-reverse">
+                  <button 
+                    onClick={() => handleViewBroker(broker)}
+                    className="p-1 hover:bg-blue-100 rounded text-blue-600"
+                    title="عرض التفاصيل"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleEditBroker(broker)}
+                    className="p-1 hover:bg-green-100 rounded text-green-600"
+                    title="تعديل"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteBroker(broker)}
+                    className="p-1 hover:bg-red-100 rounded text-red-600"
+                    title="حذف"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Contact Info */}
@@ -277,13 +464,19 @@ export const Brokers: React.FC = () => {
 
               {/* Actions */}
               <div className="mt-4 flex items-center space-x-2 space-x-reverse">
-                <button className="flex-1 bg-blue-50 text-blue-600 py-2 px-3 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium">
-                  <MessageSquare className="h-4 w-4 mr-1" />
-                  رسالة
-                </button>
-                <button className="flex-1 bg-gray-50 text-gray-600 py-2 px-3 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium">
-                  <TrendingUp className="h-4 w-4 mr-1" />
+                <button 
+                  onClick={() => handleViewBroker(broker)}
+                  className="flex-1 bg-blue-50 text-blue-600 py-2 px-3 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium flex items-center justify-center"
+                >
+                  <Eye className="h-4 w-4 ml-1" />
                   عرض التفاصيل
+                </button>
+                <button 
+                  onClick={() => handleEditBroker(broker)}
+                  className="flex-1 bg-green-50 text-green-600 py-2 px-3 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium flex items-center justify-center"
+                >
+                  <Edit className="h-4 w-4 ml-1" />
+                  تعديل
                 </button>
               </div>
             </div>
@@ -299,13 +492,47 @@ export const Brokers: React.FC = () => {
               {searchTerm || statusFilter ? 'لم يتم العثور على سماسرة مطابقة للبحث' : 'لم يتم إضافة أي سماسرة بعد'}
             </p>
             {!searchTerm && !statusFilter && (
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+              <button 
+                onClick={handleCreateBroker}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
                 إضافة أول سمسار
               </button>
             )}
           </div>
         )}
       </div>
+
+      {/* Notification */}
+      {notification.show && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
+          notification.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          {notification.message}
+        </div>
+      )}
+
+      {/* Broker Modal */}
+      <BrokerModal
+        isOpen={brokerModal.isOpen}
+        onClose={closeBrokerModal}
+        broker={brokerModal.broker}
+        mode={brokerModal.mode}
+        onSave={handleSaveBroker}
+        loading={actionLoading}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title="حذف السمسار"
+        message={`هل أنت متأكد من حذف السمسار "${deleteModal.broker?.name}"؟ هذا الإجراء لا يمكن التراجع عنه. إذا كان لدى السمسار عقارات أو رسائل مرتبطة، سيتم إلغاء تفعيله بدلاً من الحذف.`}
+        confirmText="حذف السمسار"
+        loading={actionLoading}
+        type="danger"
+      />
     </div>
   );
 };

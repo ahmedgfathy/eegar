@@ -19,14 +19,24 @@ const navigation = [
   { name: 'استيراد البيانات', href: '/import', icon: Upload },
 ];
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isMobileMenuOpen?: boolean;
+  onClose?: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ isMobileMenuOpen = false, onClose }) => {
   const location = useLocation();
 
+  const handleLinkClick = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <div style={{ display: 'none' }} className="sidebar-container">
+    <div className={`sidebar-container ${isMobileMenuOpen ? 'sidebar-mobile-open' : ''}`}>
       <div className="sidebar">
         <div className="sidebar-content">
-
           <nav className="nav">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
@@ -35,6 +45,7 @@ export const Sidebar: React.FC = () => {
                   key={item.name}
                   to={item.href}
                   className={`nav-link ${isActive ? 'active' : ''}`}
+                  onClick={handleLinkClick}
                 >
                   <item.icon className="nav-icon" />
                   {item.name}

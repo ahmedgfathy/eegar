@@ -13,8 +13,19 @@ export const brokerApi = {
   },
 
   // Brokers
-  async getBrokers(): Promise<Broker[]> {
-    const response = await fetch(`${API_BASE_URL}/brokers`);
+  async getBrokers(params?: {
+    search?: string;
+    status?: string;
+    limit?: number;
+  }): Promise<Broker[]> {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    else queryParams.append('limit', '1000'); // Default to higher limit to show all brokers
+    
+    const url = `${API_BASE_URL}/brokers${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const response = await fetch(url);
     if (!response.ok) {
       throw new Error('Failed to fetch brokers');
     }
@@ -43,6 +54,30 @@ export const brokerApi = {
     return response.json();
   },
 
+  async createBroker(data: Partial<Broker>): Promise<Broker> {
+    const response = await fetch(`${API_BASE_URL}/brokers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create broker');
+    }
+    return response.json();
+  },
+
+  async deleteBroker(id: number): Promise<{ message: string; soft_delete: boolean }> {
+    const response = await fetch(`${API_BASE_URL}/brokers/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete broker');
+    }
+    return response.json();
+  },
+
   // Properties
   async getProperties(filters?: {
     listingType?: string;
@@ -51,6 +86,7 @@ export const brokerApi = {
     maxPrice?: number;
     location?: string;
     brokerId?: number;
+    limit?: number;
   }): Promise<Property[]> {
     const params = new URLSearchParams();
     if (filters) {
@@ -59,6 +95,11 @@ export const brokerApi = {
           params.append(key, value.toString());
         }
       });
+    }
+    
+    // Set default limit to show all properties unless specified
+    if (!filters?.limit) {
+      params.append('limit', '2000');
     }
     
     const response = await fetch(`${API_BASE_URL}/properties?${params}`);
