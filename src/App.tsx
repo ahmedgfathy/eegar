@@ -30,7 +30,7 @@ function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Layout>
-                <Dashboard />
+                <BrokerDashboard />
               </Layout>
             </ProtectedRoute>
           } />
