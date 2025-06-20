@@ -8,7 +8,7 @@ async function exportFromMariaDB() {
   const mariaDbConnection = await mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'your_password', // Update this with your MariaDB password
+    password: 'zerocall', // Your MariaDB password from .env
     database: 'eegar'
   });
 
