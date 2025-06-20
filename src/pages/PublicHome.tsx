@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { brokerApi } from '../lib/broker-api';
 import { Property } from '../types/broker';
+import Logo from '../components/Logo';
 
 // Search filters interface
 interface SearchFilters {
@@ -92,29 +93,24 @@ const SubscriptionModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 const PublicHeader: React.FC = () => {
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50">
-      <div className="container mx-auto px-8">
-        <div className="flex items-center justify-between h-24">
+      <div className="container mx-auto px-6">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <div className="flex items-center">
-            <div className="bg-blue-600 text-white p-4 rounded-xl ml-10">
-              <Building className="h-8 w-8" />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900">اي ايجار</h1>
-          </div>
+          <Logo size="medium" />
           
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-20 space-x-reverse">
-            <a href="#home" className="text-blue-600 font-semibold hover:text-blue-700 px-4 py-3 text-lg">الرئيسية</a>
-            <a href="#sale" className="text-gray-700 hover:text-blue-600 px-4 py-3 text-lg">للبيع</a>
-            <a href="#rent" className="text-gray-700 hover:text-blue-600 px-4 py-3 text-lg">للإيجار</a>
-            <a href="#agents" className="text-gray-700 hover:text-blue-600 px-4 py-3 text-lg">الوسطاء</a>
-            <a href="#about" className="text-gray-700 hover:text-blue-600 px-4 py-3 text-lg">من نحن</a>
-            <a href="#contact" className="text-gray-700 hover:text-blue-600 px-4 py-3 text-lg">تواصل معنا</a>
+          <nav className="hidden md:flex items-center space-x-12 space-x-reverse">
+            <a href="#home" className="text-blue-600 font-semibold hover:text-blue-700 px-3 py-2">الرئيسية</a>
+            <a href="#sale" className="text-gray-700 hover:text-blue-600 px-3 py-2">للبيع</a>
+            <a href="#rent" className="text-gray-700 hover:text-blue-600 px-3 py-2">للإيجار</a>
+            <a href="#agents" className="text-gray-700 hover:text-blue-600 px-3 py-2">الوسطاء</a>
+            <a href="#about" className="text-gray-700 hover:text-blue-600 px-3 py-2">من نحن</a>
+            <a href="#contact" className="text-gray-700 hover:text-blue-600 px-3 py-2">تواصل معنا</a>
           </nav>
           
           {/* Login Button */}
           <button 
-            className="bg-blue-600 text-white px-10 py-4 rounded-xl hover:bg-blue-700 transition-colors text-lg font-semibold"
+            className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
             onClick={() => window.location.href = '/admin'}
           >
             تسجيل الدخول
@@ -159,7 +155,7 @@ const HeroSection: React.FC<{ properties: Property[], onSearch: (filters: Search
   };
   
   return (
-    <div className="relative h-[600px] md:h-[700px] overflow-hidden">
+    <div className="relative h-[500px] md:h-[600px] overflow-hidden">
       {/* Background Slider */}
       <div className="absolute inset-0">
         {heroProperties.length > 0 ? (
@@ -193,39 +189,39 @@ const HeroSection: React.FC<{ properties: Property[], onSearch: (filters: Search
         <>
           <button
             onClick={prevSlide}
-            className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-all"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm transition-all"
           >
-            <ChevronLeft className="h-7 w-7" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-all"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm transition-all"
           >
-            <ChevronRight className="h-7 w-7" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </>
       )}
       
       {/* Content Overlay */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center text-white px-8 max-w-7xl">
-          <h1 className="text-6xl md:text-8xl font-bold mb-16 leading-tight">
+        <div className="text-center text-white px-6 max-w-4xl">
+          <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
             اكتشف منزل أحلامك
           </h1>
-          <p className="text-3xl md:text-4xl mb-20 opacity-90 leading-relaxed">
+          <p className="text-lg md:text-xl mb-8 opacity-90 leading-relaxed">
             آلاف العقارات المميزة في العاشر من رمضان وما حولها
           </p>
           
           {/* Search Filter Bar */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-10 max-w-7xl mx-auto shadow-2xl">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 max-w-4xl mx-auto shadow-xl">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Search Input */}
               <div className="relative">
-                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-6 w-6" />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   type="text"
                   placeholder="ابحث بالمنطقة أو رقم الوسيط..."
-                  className="w-full pr-14 pl-8 py-5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-lg"
+                  className="w-full pr-10 pl-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   dir="rtl"
@@ -234,7 +230,7 @@ const HeroSection: React.FC<{ properties: Property[], onSearch: (filters: Search
               
               {/* Listing Type */}
               <select
-                className="w-full px-8 py-5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-lg"
+                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 value={listingType}
                 onChange={(e) => setListingType(e.target.value)}
               >
@@ -246,7 +242,7 @@ const HeroSection: React.FC<{ properties: Property[], onSearch: (filters: Search
               
               {/* Property Type */}
               <select
-                className="w-full px-8 py-5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-lg"
+                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 value={propertyType}
                 onChange={(e) => setPropertyType(e.target.value)}
               >
@@ -261,10 +257,10 @@ const HeroSection: React.FC<{ properties: Property[], onSearch: (filters: Search
               
               {/* Search Button */}
               <button 
-                className="bg-blue-600 text-white px-10 py-5 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center text-lg font-semibold"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center font-semibold"
                 onClick={handleSearch}
               >
-                <Search className="h-6 w-6 ml-3" />
+                <Search className="h-5 w-5 ml-2" />
                 بحث
               </button>
             </div>
@@ -274,12 +270,12 @@ const HeroSection: React.FC<{ properties: Property[], onSearch: (filters: Search
       
       {/* Slide Indicators */}
       {heroProperties.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 space-x-reverse">
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 space-x-reverse">
           {heroProperties.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`w-4 h-4 rounded-full transition-all ${
+              className={`w-3 h-3 rounded-full transition-all ${
                 index === currentSlide ? 'bg-white' : 'bg-white/50'
               }`}
             />
@@ -521,23 +517,23 @@ export const PublicHome: React.FC = () => {
       <HeroSection properties={properties} onSearch={handleSearch} />
       
       {/* Featured Properties Section */}
-      <section id="featured-properties" className="py-24 bg-white">
-        <div className="container mx-auto px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-8">
+      <section id="featured-properties" className="py-16 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               العقارات المميزة
               {filteredProperties.length !== properties.length && (
-                <span className="text-blue-600 text-2xl font-normal block mt-4">
+                <span className="text-blue-600 text-lg font-normal block mt-2">
                   {filteredProperties.length} نتيجة من أصل {properties.length}
                 </span>
               )}
             </h2>
-            <p className="text-gray-600 text-2xl max-w-3xl mx-auto leading-relaxed">
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
               اكتشف مجموعة مختارة من أفضل العقارات المتاحة في المنطقة
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredProperties.map((property) => (
               <PropertyCard 
                 key={property.id} 
@@ -547,9 +543,9 @@ export const PublicHome: React.FC = () => {
             ))}
           </div>
           
-          <div className="text-center mt-16">
+          <div className="text-center mt-12">
             <button 
-              className="bg-blue-600 text-white px-12 py-4 rounded-xl hover:bg-blue-700 transition-colors text-xl font-semibold"
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
               onClick={() => {
                 setFeaturedProperties(filteredProperties.slice(0, 20));
                 const resultsSection = document.getElementById('featured-properties');
